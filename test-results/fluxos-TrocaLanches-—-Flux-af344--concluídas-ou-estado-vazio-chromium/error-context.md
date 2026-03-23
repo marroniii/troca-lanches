@@ -1,0 +1,55 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: TrocaLanches
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: "?"
+      - generic [ref=e6]: Meu perfil
+  - tablist [ref=e7]:
+    - button "🍽️ Propostas" [ref=e8] [cursor=pointer]:
+      - generic [ref=e9]: 🍽️
+      - text: Propostas
+    - button "💬 Feed" [active] [ref=e10] [cursor=pointer]:
+      - generic [ref=e11]: 💬
+      - generic [ref=e12]: Feed
+    - button "👤 Perfil" [ref=e13] [cursor=pointer]:
+      - generic [ref=e14]: 👤
+      - text: Perfil
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Feed" [level=2] [ref=e17]
+      - generic [ref=e18]: Trocas concluídas — todos veem, participantes comentam
+      - generic [ref=e20]:
+        - generic [ref=e21]:
+          - generic [ref=e22]: "N"
+          - generic [ref=e23]:
+            - generic [ref=e24]: nunes ⇄ marroni
+            - generic [ref=e25]: Hamburgueria · Restaurante Mexicano · 🛵 Motoboy · 23/03/2026
+        - img "humburguer" [ref=e26]
+        - generic [ref=e27]:
+          - generic [ref=e28]: humburguer
+          - generic [ref=e29]: carbne
+        - generic [ref=e30]:
+          - button "😍" [ref=e31] [cursor=pointer]: 😍
+          - button "👏" [ref=e32] [cursor=pointer]: 👏
+          - button "🔥 2" [ref=e33] [cursor=pointer]:
+            - text: 🔥
+            - generic [ref=e34]: "2"
+          - button "😋" [ref=e35] [cursor=pointer]: 😋
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - generic [ref=e38]: M
+            - generic [ref=e39]:
+              - generic [ref=e40]: marroni
+              - generic [ref=e41]: boam de mais
+              - generic [ref=e42]: 23/03/2026
+          - generic [ref=e43]:
+            - generic [ref=e44]: "N"
+            - generic [ref=e45]:
+              - generic [ref=e46]: nunes
+              - generic [ref=e47]: gostei vamos fazer de novo
+              - generic [ref=e48]: 23/03/2026
+          - generic [ref=e49]: Só os participantes da troca podem comentar
+```

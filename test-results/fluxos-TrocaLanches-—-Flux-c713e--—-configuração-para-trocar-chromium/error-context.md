@@ -1,0 +1,55 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: TrocaLanches
+    - generic [ref=e4] [cursor=pointer]:
+      - generic [ref=e5]: "?"
+      - generic [ref=e6]: Meu perfil
+  - tablist [ref=e7]:
+    - button "🍽️ Propostas" [active] [ref=e8] [cursor=pointer]:
+      - generic [ref=e9]: 🍽️
+      - text: Propostas
+    - button "💬 Feed" [ref=e10] [cursor=pointer]:
+      - generic [ref=e11]: 💬
+      - generic [ref=e12]: Feed
+    - button "👤 Perfil" [ref=e13] [cursor=pointer]:
+      - generic [ref=e14]: 👤
+      - text: Perfil
+  - main [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Propostas" [level=2] [ref=e17]
+      - generic [ref=e18]: Lanches disponíveis para troca agora
+      - generic [ref=e19]:
+        - generic [ref=e20]: Buscar por local ou lanche
+        - textbox "Buscar por local ou lanche" [ref=e21]:
+          - /placeholder: "Ex: Pizzaria, Hamburgueria, Burrito..."
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - img "burrito" [ref=e24]
+          - generic [ref=e25]:
+            - generic [ref=e27]:
+              - generic [ref=e28]: marroni
+              - generic [ref=e29]: 📍 Restaurante Mexicano
+            - generic [ref=e30]: burrito
+            - generic [ref=e31]: carne
+            - generic [ref=e32]:
+              - generic [ref=e33]: 🛵 Motoboy
+              - generic [ref=e34]: 🚶 Deslocamento
+              - generic [ref=e35]: 23/03/2026
+            - button "Configure seu perfil para trocar" [ref=e37] [cursor=pointer]
+        - generic [ref=e38]:
+          - generic [ref=e39]: 🍽️
+          - generic [ref=e40]:
+            - generic [ref=e42]:
+              - generic [ref=e43]: Usuario Lanche
+              - generic [ref=e44]: 📍 Pizzaria
+            - generic [ref=e45]: Pizza Margherita
+            - generic [ref=e46]: Molho, mussarela e manjericão
+            - generic [ref=e47]:
+              - generic [ref=e48]: 🛵 Motoboy
+              - generic [ref=e49]: 🚶 Deslocamento
+              - generic [ref=e50]: 23/03/2026
+            - button "Configure seu perfil para trocar" [ref=e52] [cursor=pointer]
+```

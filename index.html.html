@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrocaLanches</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --brand:#FF4D00; --brand-soft:#FFF0EB; --brand-dark:#CC3A00;
+  --ink:#1A1208; --ink-mid:#5C4F42; --ink-light:#A89888;
+  --surface:#FDFAF7; --s2:#F4EFE9; --s3:#EAE3DA;
+  --green:#1A7A4A; --green-soft:#E8F7EF;
+  --red:#C0392B; --red-soft:#FCECEA;
+  --amber:#B45309; --amber-soft:#FEF3C7;
+  --blue:#1D6FA4; --blue-soft:#E8F3FB;
+  --r:14px; --rsm:8px;
+  --sh:0 2px 12px rgba(26,18,8,0.08);
+  --shl:0 8px 32px rgba(26,18,8,0.14);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;}
+
+/* HEADER */
+.app-header{background:var(--ink);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:#fff;letter-spacing:-.02em;}
+.logo span{color:var(--brand);}
+.user-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:5px 13px 5px 6px;cursor:pointer;transition:background .2s;}
+.user-pill:hover{background:rgba(255,255,255,.15);}
+.uavatar{width:26px;height:26px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.7rem;color:#fff;flex-shrink:0;}
+.uname{font-size:.82rem;color:rgba(255,255,255,.85);font-weight:500;}
+
+/* NAV */
+.nav-bar{background:#fff;border-bottom:1px solid var(--s3);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:58px;z-index:99;}
+.nav-bar::-webkit-scrollbar{display:none;}
+.nav-btn{flex:1;min-width:80px;padding:12px 6px 10px;border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;color:var(--ink-light);border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.nav-btn .ni{font-size:1rem;}
+.nav-btn:hover{color:var(--ink);}
+.nav-btn.active{color:var(--brand);border-bottom-color:var(--brand);}
+.bdot{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;font-size:.6rem;font-weight:700;min-width:15px;height:15px;border-radius:100px;padding:0 3px;margin-left:3px;}
+
+/* LAYOUT */
+.main{max-width:680px;margin:0 auto;padding:20px 14px 90px;}
+.screen{display:none;}
+.screen.active{display:block;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+
+.sec-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;letter-spacing:-.02em;margin-bottom:3px;}
+.sec-sub{font-size:.86rem;color:var(--ink-mid);margin-bottom:22px;}
+
+/* FORMS */
+.fg{margin-bottom:16px;}
+.fl{display:block;font-size:.75rem;font-weight:600;color:var(--ink-mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.fi,.fs,.fta{width:100%;padding:11px 13px;border:1.5px solid var(--s3);border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:.93rem;color:var(--ink);background:var(--surface);transition:border-color .2s,box-shadow .2s;appearance:none;}
+.fi:focus,.fs:focus,.fta:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(255,77,0,.1);}
+.fta{resize:vertical;min-height:72px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:var(--rsm);font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .18s;}
+.btn-primary{background:var(--brand);color:#fff;}
+.btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px);}
+.btn-ghost{background:var(--s2);color:var(--ink-mid);border:1.5px solid var(--s3);}
+.btn-ghost:hover{background:var(--s3);}
+.btn-success{background:var(--green);color:#fff;}
+.btn-success:hover{background:#155e38;transform:translateY(-1px);}
+.btn-danger{background:var(--red);color:#fff;}
+.btn-danger:hover{background:#a93226;}
+.btn-sm{padding:6px 13px!important;font-size:.8rem!important;}
+.btn-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+
+/* CHIPS */
+.chip{display:inline-block;padding:3px 10px;border-radius:100px;font-size:.75rem;font-weight:500;}
+.chip-brand{background:var(--brand-soft);color:var(--brand-dark);}
+.chip-green{background:var(--green-soft);color:var(--green);}
+.chip-amber{background:var(--amber-soft);color:var(--amber);}
+.chip-red{background:var(--red-soft);color:var(--red);}
+.chip-blue{background:var(--blue-soft);color:var(--blue);}
+.chip-gray{background:var(--s2);color:var(--ink-mid);}
+
+/* SEGMENT */
+.seg{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-light);margin:24px 0 11px;display:flex;align-items:center;gap:8px;}
+.seg::after{content:'';flex:1;height:1px;background:var(--s3);}
+
+/* PROFILE BANNER */
+.pbanner{background:var(--ink);border-radius:var(--r);padding:20px;margin-bottom:22px;display:flex;align-items:center;gap:16px;}
+.pavatar{width:50px;height:50px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;flex-shrink:0;}
+.pname{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin-bottom:2px;}
+.plocal{font-size:.82rem;color:rgba(255,255,255,.5);}
+
+/* LANCHE CARD NO PERFIL */
+.lanche-edit-card{background:#fff;border:1.5px solid var(--s3);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh);}
+.lanche-edit-img{width:100%;height:140px;object-fit:cover;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--ink-light);font-size:.85rem;}
+.lanche-edit-img img{width:100%;height:140px;object-fit:cover;display:block;}
+.lanche-edit-body{padding:14px 16px;}
+.lanche-edit-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:4px;}
+.lanche-edit-desc{font-size:.82rem;color:var(--ink-mid);margin-bottom:10px;}
+.lanche-edit-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+
+/* FOTO UPLOAD */
+.foto-upload{border:2px dashed var(--s3);border-radius:var(--rsm);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--surface);}
+.foto-upload:hover{border-color:var(--brand);}
+.foto-upload input{display:none;}
+.foto-preview{width:100%;max-height:180px;object-fit:cover;border-radius:var(--rsm);display:block;margin-top:10px;}
+
+/* PROPOSTA CARD (feed) */
+.pcard{background:#fff;border:1.5px solid var(--s3);border-radius:var(--r);overflow:hidden;margin-bottom:16px;box-shadow:var(--sh);transition:transform .2s,box-shadow .2s;}
+.pcard:hover{transform:translateY(-1px);box-shadow:var(--shl);}
+.pcard-img{width:100%;height:180px;object-fit:cover;background:var(--s2);display:block;}
+.pcard-img-placeholder{width:100%;height:180px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:2.5rem;opacity:.4;}
+.pcard-body{padding:16px 18px;}
+.pcard-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px;}
+.pcard-autor{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+.pcard-restaurante{font-size:.78rem;color:var(--ink-mid);margin-top:2px;}
+.pcard-nome{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:5px;}
+.pcard-desc{font-size:.88rem;color:var(--ink-mid);margin-bottom:12px;line-height:1.5;}
+.pcard-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.pcard-entrega{font-size:.8rem;color:var(--ink-mid);display:flex;align-items:center;gap:4px;}
+.pcard-actions{display:flex;gap:8px;}
+
+/* MODAL */
+.mwrap{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,18,8,.55);align-items:flex-end;justify-content:center;}
+.mwrap.open{display:flex;animation:fbg .2s ease;}
+@keyframes fbg{from{opacity:0;}to{opacity:1;}}
+.modal{background:#fff;border-radius:var(--r) var(--r) 0 0;width:100%;max-width:680px;max-height:92vh;overflow-y:auto;animation:sup .28s cubic-bezier(.22,1,.36,1);}
+@keyframes sup{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.mhandle{width:36px;height:4px;background:var(--s3);border-radius:2px;margin:11px auto 0;}
+.mhead{padding:16px 20px 14px;border-bottom:1px solid var(--s3);display:flex;align-items:center;justify-content:space-between;}
+.mhead-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;}
+.mclose{width:30px;height:30px;border:none;background:var(--s2);border-radius:50%;cursor:pointer;font-size:.95rem;color:var(--ink-mid);display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.mclose:hover{background:var(--s3);}
+.mbody{padding:20px;}
+.mfooter{padding:0 20px 26px;display:flex;gap:8px;}
+.mfooter .btn{flex:1;}
+
+/* ENTREGA OPTS */
+.eopts{display:flex;gap:10px;}
+.eopt{flex:1;padding:13px 8px;border:2px solid var(--s3);border-radius:var(--rsm);cursor:pointer;text-align:center;transition:all .18s;background:#fff;}
+.eopt:hover{border-color:var(--brand);background:var(--brand-soft);}
+.eopt.sel{border-color:var(--brand);background:var(--brand-soft);}
+.eopt input{display:none;}
+.eopt .ei{font-size:1.4rem;display:block;margin-bottom:4px;}
+.eopt .el{font-weight:600;font-size:.85rem;color:var(--ink);display:block;}
+.eopt .es{font-size:.72rem;color:var(--ink-mid);display:block;margin-top:1px;}
+
+/* NOVA PROPOSTA BTN */
+.np-btn{display:flex;align-items:center;gap:14px;background:var(--brand);color:#fff;border:none;border-radius:var(--r);padding:16px 20px;width:100%;cursor:pointer;font-family:'DM Sans',sans-serif;margin-bottom:22px;transition:background .2s,transform .2s;}
+.np-btn:hover{background:var(--brand-dark);transform:translateY(-1px);}
+.np-btn .npi{font-size:1.7rem;flex-shrink:0;}
+.np-btn .npt{text-align:left;}
+.np-btn .nptitle{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;}
+.np-btn .npsub{font-size:.8rem;opacity:.8;margin-top:1px;}
+
+/* FEED */
+.feed-card{background:#fff;border:1px solid var(--s3);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--sh);}
+.feed-header{padding:14px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--s3);}
+.feed-avatar{width:36px;height:36px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0;}
+.feed-troca-info{flex:1;}
+.feed-troca-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;}
+.feed-troca-sub{font-size:.75rem;color:var(--ink-mid);margin-top:1px;}
+.feed-body{padding:14px 16px;}
+.feed-lanche-nome{font-weight:600;font-size:.95rem;margin-bottom:4px;}
+.feed-lanche-desc{font-size:.82rem;color:var(--ink-mid);margin-bottom:10px;}
+.feed-img{width:100%;height:160px;object-fit:cover;display:block;background:var(--s2);}
+
+/* REAÇÕES */
+.reacoes-bar{display:flex;align-items:center;gap:6px;padding:10px 16px;border-top:1px solid var(--s3);border-bottom:1px solid var(--s3);}
+.reacao-btn{background:var(--s2);border:none;border-radius:100px;padding:5px 11px;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.reacao-btn:hover{background:var(--s3);transform:scale(1.05);}
+.reacao-btn.ativa{background:var(--brand-soft);border:1px solid var(--brand);}
+.reacao-count{font-size:.75rem;font-weight:600;color:var(--ink-mid);}
+
+/* COMENTÁRIOS */
+.comentarios{padding:12px 16px;}
+.comentario-item{display:flex;gap:9px;margin-bottom:12px;}
+.com-avatar{width:28px;height:28px;background:var(--s3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:.65rem;color:var(--ink-mid);flex-shrink:0;}
+.com-bubble{background:var(--s2);border-radius:0 10px 10px 10px;padding:8px 12px;flex:1;}
+.com-autor{font-size:.72rem;font-weight:600;color:var(--ink-mid);margin-bottom:2px;}
+.com-texto{font-size:.85rem;color:var(--ink);}
+.com-data{font-size:.68rem;color:var(--ink-light);margin-top:3px;}
+.com-input-row{display:flex;gap:8px;padding:8px 16px 14px;}
+.com-input-row .fi{flex:1;padding:9px 12px;font-size:.85rem;}
+.com-input-row .btn{padding:9px 14px;font-size:.82rem;}
+.com-locked{font-size:.8rem;color:var(--ink-light);font-style:italic;padding:6px 0 10px;text-align:center;}
+
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--ink-light);}
+.empty .ei{font-size:2rem;margin-bottom:11px;opacity:.45;}
+.empty .et{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:var(--ink-mid);margin-bottom:5px;}
+.empty .es{font-size:.83rem;}
+
+/* INPUT ROW */
+.irow{display:flex;gap:8px;margin-bottom:10px;}
+.irow .fi{flex:1;}
+
+@media(max-width:500px){.eopts{flex-direction:column;}.btn-row{flex-direction:column;}.btn-row .btn{width:100%;}}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">Troca<span>Lanches</span></div>
+  <div class="user-pill" onclick="irPara('perfil')">
+    <div class="uavatar" id="h-av">?</div>
+    <span class="uname" id="h-nm">Meu perfil</span>
+  </div>
+</header>
+
+<nav class="nav-bar" role="tablist">
+  <button class="nav-btn active" id="tab-propostas" onclick="irPara('propostas')">
+    <span class="ni">🍽️</span>Propostas
+  </button>
+  <button class="nav-btn" id="tab-feed" onclick="irPara('feed')">
+    <span class="ni">💬</span>
+    <span>Feed<span class="bdot" id="bdot-feed" style="display:none">0</span></span>
+  </button>
+  <button class="nav-btn" id="tab-perfil" onclick="irPara('perfil')">
+    <span class="ni">👤</span>Perfil
+  </button>
+</nav>
+
+<main class="main">
+
+  <!-- PROPOSTAS -->
+  <section id="screen-propostas" class="screen active">
+    <h2 class="sec-title">Propostas</h2>
+    <div class="sec-sub">Lanches disponíveis para troca agora</div>
+    <div id="lista-propostas"></div>
+  </section>
+
+  <!-- FEED -->
+  <section id="screen-feed" class="screen">
+    <h2 class="sec-title">Feed</h2>
+    <div class="sec-sub">Trocas concluídas — todos veem, participantes comentam</div>
+    <div id="lista-feed"></div>
+  </section>
+
+  <!-- PERFIL -->
+  <section id="screen-perfil" class="screen">
+    <h2 class="sec-title">Meu perfil</h2>
+    <div class="sec-sub">Suas informações e lanches disponíveis para troca</div>
+    <div id="perfil-banner"></div>
+
+    <div style="background:#fff;border:1px solid var(--s3);border-radius:var(--r);padding:18px;margin-bottom:20px;box-shadow:var(--sh);">
+      <div class="fg">
+        <label class="fl" for="inp-nome">Seu nome</label>
+        <input class="fi" id="inp-nome" type="text" placeholder="Ex: João Silva">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl" for="inp-local">Onde você trabalha?</label>
+        <select class="fs" id="inp-local">
+          <option value="Restaurante Mexicano">🌮 Restaurante Mexicano</option>
+          <option value="Hamburgueria">🍔 Hamburgueria</option>
+          <option value="Pizzaria">🍕 Pizzaria</option>
+          <option value="Restaurante Japonês">🍱 Restaurante Japonês</option>
+          <option value="Restaurante Brasileiro">🍽️ Restaurante Brasileiro</option>
+          <option value="Lanchonete">🥪 Lanchonete</option>
+          <option value="Padaria">🥖 Padaria</option>
+          <option value="Outro">🏪 Outro</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="salvarPerfil()">Salvar perfil</button>
+      </div>
+    </div>
+
+    <div class="seg">Meus lanches</div>
+
+    <button class="np-btn" onclick="abrirModalLanche()">
+      <span class="npi">🍱</span>
+      <span class="npt">
+        <span class="nptitle">Adicionar lanche</span>
+        <span class="npsub">Nome, foto e descrição</span>
+      </span>
+    </button>
+
+    <div id="lista-lanches-perfil"></div>
+  </section>
+
+</main>
+
+<!-- MODAL: PROPOSTA (interesse + entrega) -->
+<div class="mwrap" id="modal-prop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title" id="mp-titulo">Demonstrar interesse</span>
+      <button class="mclose" onclick="fm('modal-prop')">✕</button>
+    </div>
+    <div class="mbody">
+      <div id="mp-lanche-preview" style="margin-bottom:16px"></div>
+      <div class="fg">
+        <label class="fl">Como será a entrega?</label>
+        <div class="eopts">
+          <label class="eopt" id="eopt-motoboy" onclick="selE('motoboy')">
+            <input type="radio" name="entrega" value="motoboy">
+            <span class="ei">🛵</span><span class="el">Motoboy</span><span class="es">Via entregador</span>
+          </label>
+          <label class="eopt" id="eopt-deslocamento" onclick="selE('deslocamento')">
+            <input type="radio" name="entrega" value="deslocamento">
+            <span class="ei">🚶</span><span class="el">Deslocamento</span><span class="es">Eu mesmo levo/busco</span>
+          </label>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl">Mensagem para o dono (opcional)</label>
+        <textarea class="fta" id="mp-msg" placeholder="Ex: Posso na terça ao meio-dia!"></textarea>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-prop')">Cancelar</button>
+      <button class="btn btn-success" onclick="confirmarInteresse()">✓ Confirmar interesse</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ACEITAR / VER INTERESSADOS -->
+<div class="mwrap" id="modal-interesse" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title">Interessados</span>
+      <button class="mclose" onclick="fm('modal-interesse')">✕</button>
+    </div>
+    <div class="mbody" id="mi-body"></div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-interesse')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CADASTRAR / EDITAR LANCHE -->
+<div class="mwrap" id="modal-lanche" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title" id="ml-titulo">Novo lanche</span>
+      <button class="mclose" onclick="fm('modal-lanche')">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fg">
+        <label class="fl">Foto do lanche</label>
+        <label class="foto-upload" id="foto-upload-label" onclick="document.getElementById('foto-input').click()">
+          <input type="file" id="foto-input" accept="image/*" onchange="onFotoChange(event)">
+          <span id="foto-placeholder">
+            <span style="display:block;font-size:1.8rem;margin-bottom:6px">📸</span>
+            <span style="display:block;font-size:.82rem;color:var(--ink-mid)">Clique para adicionar foto</span>
+          </span>
+          <img
+            id="foto-preview-img"
+            class="foto-preview"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+            alt=""
+            style="display:none">
+        </label>
+        <div style="margin-top:8px;">
+          <label class="fl" style="margin-bottom:5px">Ou cole uma URL de imagem</label>
+          <input class="fi" id="foto-url" type="url" placeholder="https://..." oninput="onFotoUrl(this.value)">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" for="ml-nome">Nome do lanche</label>
+        <input class="fi" id="ml-nome" type="text" placeholder="Ex: Burrito de Carne">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl" for="ml-desc">Descrição / ingredientes</label>
+        <textarea class="fta" id="ml-desc" placeholder="Ex: Burrito recheado com carne temperada, arroz, feijão, queijo e molho especial"></textarea>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-lanche')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarLanche()">Salvar lanche</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let D = { perfil:null, lanches:[], propostas:[], feed:[] };
+let eSel = null, propSel = null, lancheEditId = null, fotoB64 = null;
+
+/* ── PERSIST ── */
+function save(){ localStorage.setItem('tl4', JSON.stringify(D)); }
+function load(){
+  const s = localStorage.getItem('tl4');
+  if(s){ D = JSON.parse(s); return; }
+  /* dados demo */
+  D.propostas = [
+    { id:1001, autorNome:'Maria Santos', autorLocal:'Hamburgueria',
+      lanche:'Hambúrguer Clássico',
+      desc:'Hambúrguer artesanal 180g, queijo cheddar, alface, tomate e molho especial da casa.',
+      foto:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80',
+      entregaOpts:['🛵 Motoboy','🚶 Deslocamento'],
+      status:'aberta', interessados:[], data:'14/03/2026' },
+    { id:1002, autorNome:'Pedro Costa', autorLocal:'Pizzaria',
+      lanche:'Pizza Margherita (2 fatias)',
+      desc:'Massa fina, molho de tomate artesanal, muçarela de búfala e manjericão fresco.',
+      foto:'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80',
+      entregaOpts:['🛵 Motoboy'],
+      status:'aberta', interessados:[], data:'15/03/2026' }
+  ];
+  D.feed = [
+    { id:2001, a:'Ana Lima', aLocal:'Lanchonete', b:'Carlos Neto', bLocal:'Padaria',
+      lanche:'Wrap de Frango', desc:'Wrap com frango grelhado e salada fresca.',
+      foto:'https://images.unsplash.com/photo-1600335895229-6e75511892c8?w=600&q=80',
+      entrega:'🛵 Motoboy', data:'12/03/2026',
+      reacoes:{ '😍':['Ana Lima'], '👏':['Carlos Neto','Ana Lima'], '🔥':[] },
+      comentarios:[
+        { autor:'Ana Lima', texto:'Super rápido e saboroso! Recomendo!', data:'12/03/2026' },
+        { autor:'Carlos Neto', texto:'Adorei a troca, vamos repetir!', data:'12/03/2026' }
+      ]
+    }
+  ];
+}
+
+/* ── NAV ── */
+function irPara(t){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='propostas') renderPropostas();
+  if(t==='feed') renderFeed();
+  if(t==='perfil') renderPerfil();
+  atualizarBadgeFeed();
+}
+
+function atualizarBadgeFeed(){
+  const eu = D.perfil?.nome;
+  if(!eu){ document.getElementById('bdot-feed').style.display='none'; return; }
+  const n = D.feed.filter(f=> (f.a===eu||f.b===eu) && f.comentarios.some(c=>c.autor!==eu) ).length;
+  const b = document.getElementById('bdot-feed');
+  b.style.display = n>0?'inline-flex':'none'; b.textContent=n;
+}
+
+/* ── PERFIL ── */
+function salvarPerfil(){
+  const nome = document.getElementById('inp-nome').value.trim();
+  const local = document.getElementById('inp-local').value;
+  if(!nome){ alert('Preencha seu nome'); return; }
+  D.perfil = { nome, local };
+  save(); atualizarHeader(); renderPerfil();
+  alert('Perfil salvo!');
+}
+
+function atualizarHeader(){
+  if(!D.perfil) return;
+  document.getElementById('h-nm').textContent = D.perfil.nome.split(' ')[0];
+  document.getElementById('h-av').textContent = D.perfil.nome.charAt(0).toUpperCase();
+}
+
+function renderPerfil(){
+  if(D.perfil){
+    document.getElementById('inp-nome').value = D.perfil.nome;
+    document.getElementById('inp-local').value = D.perfil.local;
+    document.getElementById('perfil-banner').innerHTML = `
+      <div class="pbanner">
+        <div class="pavatar">${D.perfil.nome.charAt(0).toUpperCase()}</div>
+        <div>
+          <div class="pname">${D.perfil.nome}</div>
+          <div class="plocal">📍 ${D.perfil.local} · ${D.lanches.length} lanche(s) cadastrado(s)</div>
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('perfil-banner').innerHTML='';
+  }
+
+  const el = document.getElementById('lista-lanches-perfil');
+  if(!D.lanches.length){
+    el.innerHTML='<div class="empty"><div class="ei">🍱</div><div class="et">Nenhum lanche cadastrado</div><div class="es">Adicione seus lanches para aparecer em Propostas</div></div>';
+    return;
+  }
+  el.innerHTML = D.lanches.map(l=>`
+    <div class="lanche-edit-card">
+      ${l.foto
+        ? `<div class="lanche-edit-img"><img src="${l.foto}" alt="${l.nome}" onerror="this.parentElement.innerHTML='<div style=width:100%;height:140px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--ink-light)>Sem imagem</div>'"></div>`
+        : `<div class="lanche-edit-img" style="height:80px;display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--ink-light)">Sem foto</div>`}
+      <div class="lanche-edit-body">
+        <div class="lanche-edit-name">${l.nome}</div>
+        ${l.desc?`<div class="lanche-edit-desc">${l.desc}</div>`:''}
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="editarLanche(${l.id})">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="removerLanche(${l.id})">Remover</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── MODAL LANCHE ── */
+function abrirModalLanche(id){
+  lancheEditId = id || null; fotoB64 = null;
+  document.getElementById('ml-titulo').textContent = id ? 'Editar lanche' : 'Novo lanche';
+  const l = id ? D.lanches.find(x=>x.id===id) : null;
+  document.getElementById('ml-nome').value = l?.nome||'';
+  document.getElementById('ml-desc').value = l?.desc||'';
+  document.getElementById('foto-url').value = (l?.foto&&!l.foto.startsWith('data:'))?l.foto:'';
+  const prev = document.getElementById('foto-preview-img');
+  const ph = document.getElementById('foto-placeholder');
+  if(l?.foto){ prev.src=l.foto; prev.style.display='block'; ph.style.display='none'; }
+  else { prev.style.display='none'; ph.style.display='block'; }
+  am('modal-lanche');
+}
+
+function editarLanche(id){ abrirModalLanche(id); }
+
+function onFotoChange(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    fotoB64 = ev.target.result;
+    document.getElementById('foto-url').value='';
+    const prev = document.getElementById('foto-preview-img');
+    prev.src = fotoB64; prev.style.display='block';
+    document.getElementById('foto-placeholder').style.display='none';
+  };
+  r.readAsDataURL(f);
+}
+
+function onFotoUrl(v){
+  if(!v) return;
+  fotoB64 = null;
+  const prev = document.getElementById('foto-preview-img');
+  prev.src = v; prev.style.display='block';
+  document.getElementById('foto-placeholder').style.display='none';
+}
+
+function salvarLanche(){
+  const nome = document.getElementById('ml-nome').value.trim();
+  const desc = document.getElementById('ml-desc').value.trim();
+  const urlFoto = document.getElementById('foto-url').value.trim();
+  const foto = fotoB64 || urlFoto || null;
+  if(!nome){ alert('Informe o nome do lanche'); return; }
+  if(!D.perfil){ alert('Salve seu perfil primeiro'); return; }
+  if(lancheEditId){
+    const l = D.lanches.find(x=>x.id===lancheEditId);
+    if(l){ l.nome=nome; l.desc=desc; l.foto=foto; }
+  } else {
+    D.lanches.push({ id:Date.now(), nome, desc, foto });
+  }
+  save(); fm('modal-lanche'); renderPerfil();
+  /* atualiza propostas do usuário */
+  sincronizarPropostas();
+  renderPropostas();
+}
+
+function removerLanche(id){
+  if(!confirm('Remover este lanche?')) return;
+  D.lanches = D.lanches.filter(l=>l.id!==id);
+  D.propostas = D.propostas.filter(p=>!(p.autorNome===D.perfil?.nome && p.lancheId===id));
+  save(); renderPerfil(); renderPropostas();
+}
+
+/* sincroniza as propostas do usuário com seus lanches */
+function sincronizarPropostas(){
+  if(!D.perfil) return;
+  const eu = D.perfil.nome;
+  /* remove propostas de lanches que não existem mais */
+  D.propostas = D.propostas.filter(p=> p.autorNome!==eu || D.lanches.some(l=>l.id===p.lancheId));
+  /* adiciona/atualiza propostas para cada lanche */
+  D.lanches.forEach(l=>{
+    const existe = D.propostas.find(p=>p.autorNome===eu&&p.lancheId===l.id);
+    if(!existe){
+      D.propostas.push({
+        id: Date.now()+Math.random(),
+        autorNome: eu, autorLocal: D.perfil.local,
+        lancheId: l.id, lanche: l.nome, desc: l.desc, foto: l.foto,
+        entregaOpts:['🛵 Motoboy','🚶 Deslocamento'],
+        status:'aberta', interessados:[], data: new Date().toLocaleDateString('pt-BR')
+      });
+    } else {
+      /* atualiza dados do lanche */
+      existe.lanche=l.nome; existe.desc=l.desc; existe.foto=l.foto;
+      existe.autorLocal=D.perfil.local;
+    }
+  });
+  save();
+}
+
+/* ── PROPOSTAS ── */
+function renderPropostas(){
+  const el = document.getElementById('lista-propostas');
+  const lista = D.propostas.filter(p=>p.status==='aberta');
+  if(!lista.length){
+    el.innerHTML='<div class="empty"><div class="ei">🍽️</div><div class="et">Nenhuma proposta aberta</div><div class="es">Cadastre um lanche no seu perfil para aparecer aqui</div></div>';
+    return;
+  }
+  el.innerHTML = lista.map(p=>cardProposta(p)).join('');
+}
+
+function cardProposta(p){
+  const eu = D.perfil?.nome;
+  const ehMinha = p.autorNome===eu;
+  const jaTenhoInteresse = p.interessados.some(i=>i.nome===eu);
+  const ni = p.interessados.length;
+
+  let acoes = '';
+  if(!eu){
+    acoes = `<button class="btn btn-ghost btn-sm" onclick="irPara('perfil')">Configure seu perfil para trocar</button>`;
+  } else if(ehMinha){
+    acoes = ni>0
+      ? `<button class="btn btn-primary btn-sm" onclick="verInteressados(${p.id})">${ni} interesse(s) — responder</button>`
+      : `<span class="chip chip-gray">Aguardando interesse</span>`;
+  } else if(jaTenhoInteresse){
+    acoes = `<span class="chip chip-amber">Você demonstrou interesse</span>`;
+  } else {
+    acoes = `<button class="btn btn-success btn-sm" onclick="abrirModalProp(${p.id})">✓ Tenho interesse</button>`;
+  }
+
+  return `
+    <div class="pcard">
+      ${p.foto
+        ? `<img class="pcard-img" src="${p.foto}" alt="${p.lanche}" onerror="this.outerHTML='<div class=pcard-img-placeholder>🍽️</div>'">`
+        : `<div class="pcard-img-placeholder">🍽️</div>`}
+      <div class="pcard-body">
+        <div class="pcard-header">
+          <div>
+            <div class="pcard-autor">${p.autorNome}</div>
+            <div class="pcard-restaurante">📍 ${p.autorLocal}</div>
+          </div>
+          ${ehMinha&&ni>0?`<span class="chip chip-brand">${ni} 🔔</span>`:''}
+        </div>
+        <div class="pcard-nome">${p.lanche}</div>
+        ${p.desc?`<div class="pcard-desc">${p.desc}</div>`:''}
+        <div class="pcard-meta">
+          ${p.entregaOpts.map(e=>`<span class="pcard-entrega">${e}</span>`).join('')}
+          <span style="font-size:.75rem;color:var(--ink-light);margin-left:auto">${p.data}</span>
+        </div>
+        <div class="pcard-actions">${acoes}</div>
+      </div>
+    </div>`;
+}
+
+/* ── MODAL PROPOSTA (interesse) ── */
+function abrirModalProp(id){
+  if(!D.perfil){ alert('Configure seu perfil primeiro'); irPara('perfil'); return; }
+  propSel = id; eSel = null;
+  const p = D.propostas.find(x=>x.id===id);
+  document.getElementById('mp-titulo').textContent = `Trocar com ${p.autorNome}`;
+  document.getElementById('mp-msg').value = '';
+  document.querySelectorAll('.eopt').forEach(o=>o.classList.remove('sel'));
+
+  /* preview do lanche */
+  document.getElementById('mp-lanche-preview').innerHTML = `
+    <div style="background:var(--s2);border-radius:var(--rsm);padding:12px 14px;display:flex;gap:12px;align-items:center">
+      ${p.foto?`<img src="${p.foto}" style="width:56px;height:56px;border-radius:8px;object-fit:cover" onerror="this.style.display='none'">`:'<div style="width:56px;height:56px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:1.4rem">🍽️</div>'}
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem">${p.lanche}</div>
+        <div style="font-size:.8rem;color:var(--ink-mid)">${p.autorNome} · ${p.autorLocal}</div>
+      </div>
+    </div>`;
+
+  am('modal-prop');
+}
+
+function selE(tipo){
+  eSel=tipo;
+  document.querySelectorAll('.eopt').forEach(o=>o.classList.remove('sel'));
+  document.getElementById('eopt-'+tipo).classList.add('sel');
+}
+
+function confirmarInteresse(){
+  if(!eSel){ alert('Escolha a forma de entrega'); return; }
+  const p = D.propostas.find(x=>x.id===propSel);
+  if(!p) return;
+  p.interessados.push({
+    nome: D.perfil.nome, local: D.perfil.local,
+    entrega: eSel==='motoboy'?'🛵 Motoboy':'🚶 Deslocamento',
+    msg: document.getElementById('mp-msg').value.trim()
+  });
+  save(); fm('modal-prop'); renderPropostas(); atualizarBadgeFeed();
+}
+
+/* ── VER INTERESSADOS (dono do lanche) ── */
+function verInteressados(id){
+  const p = D.propostas.find(x=>x.id===id);
+  document.getElementById('mi-body').innerHTML = p.interessados.map(i=>`
+    <div style="border:1px solid var(--s3);border-radius:var(--rsm);padding:14px;margin-bottom:10px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:3px">${i.nome}</div>
+      <div style="font-size:.8rem;color:var(--ink-mid);margin-bottom:6px">📍 ${i.local} · ${i.entrega}</div>
+      ${i.msg?`<div style="font-size:.83rem;font-style:italic;color:var(--ink-mid);background:var(--s2);padding:8px 10px;border-radius:var(--rsm);margin-bottom:10px">"${i.msg}"</div>`:''}
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-success btn-sm" onclick="aceitarTroca(${id},'${i.nome.replace(/'/g,"\\'")}')">✓ Aceitar troca</button>
+        <button class="btn btn-ghost btn-sm" onclick="recusarInteresse(${id},'${i.nome.replace(/'/g,"\\'")}')">Recusar</button>
+      </div>
+    </div>`).join('');
+  am('modal-interesse');
+}
+
+function recusarInteresse(propId, nome){
+  const p = D.propostas.find(x=>x.id===propId);
+  p.interessados = p.interessados.filter(i=>i.nome!==nome);
+  save(); verInteressados(propId);
+  if(!p.interessados.length) fm('modal-interesse');
+  renderPropostas();
+}
+
+function aceitarTroca(propId, nomeInteressado){
+  const p = D.propostas.find(x=>x.id===propId);
+  const eu = D.perfil.nome;
+  /* manda pro feed */
+  D.feed.unshift({
+    id: Date.now(),
+    a: eu, aLocal: D.perfil.local,
+    b: nomeInteressado, bLocal: p.interessados.find(i=>i.nome===nomeInteressado)?.local||'',
+    lanche: p.lanche, desc: p.desc||'', foto: p.foto||null,
+    entrega: p.interessados.find(i=>i.nome===nomeInteressado)?.entrega||'',
+    data: new Date().toLocaleDateString('pt-BR'),
+    reacoes:{'😍':[],'👏':[],'🔥':[],'😋':[]},
+    comentarios:[]
+  });
+  /* remove proposta */
+  D.propostas = D.propostas.filter(x=>x.id!==propId);
+  /* remove lanche do perfil do usuário? não — pode querer trocar de novo */
+  save(); fm('modal-interesse');
+  renderPropostas(); atualizarBadgeFeed();
+  alert(`Troca confirmada! Aparece no Feed agora 🎉`);
+}
+
+/* ── FEED ── */
+function renderFeed(){
+  const el = document.getElementById('lista-feed');
+  if(!D.feed.length){
+    el.innerHTML='<div class="empty"><div class="ei">💬</div><div class="et">Nenhuma troca concluída ainda</div><div class="es">As trocas confirmadas aparecem aqui</div></div>';
+    return;
+  }
+  el.innerHTML = D.feed.map(f=>cardFeed(f)).join('');
+}
+
+function cardFeed(f){
+  const eu = D.perfil?.nome;
+  const participa = eu && (f.a===eu||f.b===eu);
+
+  /* reações */
+  const reacoes = Object.entries(f.reacoes).map(([emoji,lista])=>{
+    const ativa = eu && lista.includes(eu) ? 'ativa' : '';
+    return `<button class="reacao-btn ${ativa}" onclick="reagir('${f.id}','${emoji}')">${emoji} <span class="reacao-count">${lista.length||''}</span></button>`;
+  }).join('');
+
+  /* comentários */
+  const coms = f.comentarios.map(c=>`
+    <div class="comentario-item">
+      <div class="com-avatar">${c.autor.charAt(0).toUpperCase()}</div>
+      <div class="com-bubble">
+        <div class="com-autor">${c.autor}</div>
+        <div class="com-texto">${c.texto}</div>
+        <div class="com-data">${c.data}</div>
+      </div>
+    </div>`).join('');
+
+  const comInput = participa
+    ? `<div class="com-input-row">
+        <input class="fi" id="ci-${f.id}" type="text" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter')comentar('${f.id}')">
+        <button class="btn btn-primary btn-sm" onclick="comentar('${f.id}')">Enviar</button>
+       </div>`
+    : `<div class="com-locked">Só os participantes da troca podem comentar</div>`;
+
+  return `
+    <div class="feed-card">
+      <div class="feed-header">
+        <div class="feed-avatar">${f.a.charAt(0).toUpperCase()}</div>
+        <div class="feed-troca-info">
+          <div class="feed-troca-title">${f.a} ⇄ ${f.b}</div>
+          <div class="feed-troca-sub">${f.aLocal} · ${f.bLocal} · ${f.entrega} · ${f.data}</div>
+        </div>
+      </div>
+      ${f.foto?`<img class="feed-img" src="${f.foto}" alt="${f.lanche}" onerror="this.style.display='none'">`:''}
+      <div class="feed-body">
+        <div class="feed-lanche-nome">${f.lanche}</div>
+        ${f.desc?`<div class="feed-lanche-desc">${f.desc}</div>`:''}
+      </div>
+      <div class="reacoes-bar">${reacoes}</div>
+      <div class="comentarios">
+        ${coms}
+        ${comInput}
+      </div>
+    </div>`;
+}
+
+function reagir(feedId, emoji){
+  if(!D.perfil){ alert('Configure seu perfil para reagir'); return; }
+  const eu = D.perfil.nome;
+  const f = D.feed.find(x=>x.id==feedId);
+  if(!f) return;
+  const lista = f.reacoes[emoji];
+  const idx = lista.indexOf(eu);
+  if(idx>=0) lista.splice(idx,1); else lista.push(eu);
+  save(); renderFeed();
+}
+
+function comentar(feedId){
+  if(!D.perfil) return;
+  const inp = document.getElementById('ci-'+feedId);
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const f = D.feed.find(x=>x.id==feedId);
+  f.comentarios.push({ autor:D.perfil.nome, texto:txt, data:new Date().toLocaleDateString('pt-BR') });
+  inp.value='';
+  save(); renderFeed(); atualizarBadgeFeed();
+}
+
+/* ── MODAL UTILS ── */
+function am(id){ document.getElementById(id).classList.add('open'); }
+function fm(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mwrap').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+/* ── INIT ── */
+load(); atualizarHeader(); renderPropostas(); atualizarBadgeFeed();
+</script>
+</body>
+</html>

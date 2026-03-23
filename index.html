@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrocaLanches</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">Troca<span>Lanches</span></div>
+  <div class="user-pill" onclick="irPara('perfil')">
+    <div class="uavatar" id="h-av">?</div>
+    <span class="uname" id="h-nm">Meu perfil</span>
+  </div>
+</header>
+
+<nav class="nav-bar" role="tablist">
+  <button class="nav-btn active" id="tab-propostas" onclick="irPara('propostas')">
+    <span class="ni">🍽️</span>Propostas
+  </button>
+  <button class="nav-btn" id="tab-feed" onclick="irPara('feed')">
+    <span class="ni">💬</span>
+    <span>Feed<span class="bdot" id="bdot-feed" style="display:none">0</span></span>
+  </button>
+  <button class="nav-btn" id="tab-perfil" onclick="irPara('perfil')">
+    <span class="ni">👤</span>Perfil
+  </button>
+</nav>
+
+<main class="main">
+
+  <!-- PROPOSTAS -->
+  <section id="screen-propostas" class="screen active">
+    <h2 class="sec-title">Propostas</h2>
+    <div class="sec-sub">Lanches disponíveis para troca agora</div>
+    <div class="fg busca-propostas-wrap">
+      <label class="fl" for="busca-propostas">Buscar por local ou lanche</label>
+      <input class="fi busca-propostas" id="busca-propostas" type="text" placeholder="Ex: Pizzaria, Hamburgueria, Burrito..." oninput="filtrarPropostas()">
+    </div>
+    <div id="lista-propostas"></div>
+  </section>
+
+  <!-- FEED -->
+  <section id="screen-feed" class="screen">
+    <h2 class="sec-title">Feed</h2>
+    <div class="sec-sub">Trocas concluídas — todos veem, participantes comentam</div>
+    <div id="lista-feed"></div>
+  </section>
+
+  <!-- PERFIL -->
+  <section id="screen-perfil" class="screen">
+    <h2 class="sec-title">Meu perfil</h2>
+    <div class="sec-sub">Suas informações e lanches disponíveis para troca</div>
+    <div id="perfil-banner"></div>
+
+    <div style="background:#fff;border:1px solid var(--s3);border-radius:var(--r);padding:18px;margin-bottom:20px;box-shadow:var(--sh);">
+      <div class="fg">
+        <label class="fl" for="inp-nome">Seu nome</label>
+        <input class="fi" id="inp-nome" type="text" placeholder="Ex: João Silva">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl" for="inp-local">Onde você trabalha?</label>
+        <select class="fs" id="inp-local">
+          <option value="Restaurante Mexicano">🌮 Restaurante Mexicano</option>
+          <option value="Hamburgueria">🍔 Hamburgueria</option>
+          <option value="Pizzaria">🍕 Pizzaria</option>
+          <option value="Restaurante Japonês">🍱 Restaurante Japonês</option>
+          <option value="Restaurante Brasileiro">🍽️ Restaurante Brasileiro</option>
+          <option value="Lanchonete">🥪 Lanchonete</option>
+          <option value="Padaria">🥖 Padaria</option>
+          <option value="Outro">🏪 Outro</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="salvarPerfil()">Salvar perfil</button>
+      </div>
+    </div>
+
+    <div class="seg">Meus lanches</div>
+
+    <button class="np-btn" onclick="abrirModalLanche()">
+      <span class="npi">🍱</span>
+      <span class="npt">
+        <span class="nptitle">Adicionar lanche</span>
+        <span class="npsub">Nome, foto e descrição</span>
+      </span>
+    </button>
+
+    <div id="lista-lanches-perfil"></div>
+
+    <div class="seg" style="margin-top:24px">Pedidos de troca</div>
+    <div id="lista-pedidos-perfil"></div>
+  </section>
+
+</main>
+
+<!-- MODAL: PROPOSTA (interesse + entrega) -->
+<div class="mwrap" id="modal-prop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title" id="mp-titulo">Demonstrar interesse</span>
+      <button class="mclose" onclick="fm('modal-prop')">✕</button>
+    </div>
+    <div class="mbody">
+      <div id="mp-lanche-preview" style="margin-bottom:16px"></div>
+      <div class="fg">
+        <label class="fl">Como será a entrega?</label>
+        <div class="eopts">
+          <label class="eopt" id="eopt-motoboy" onclick="selE('motoboy')">
+            <input type="radio" name="entrega" value="motoboy">
+            <span class="ei">🛵</span><span class="el">Motoboy</span><span class="es">Via entregador</span>
+          </label>
+          <label class="eopt" id="eopt-deslocamento" onclick="selE('deslocamento')">
+            <input type="radio" name="entrega" value="deslocamento">
+            <span class="ei">🚶</span><span class="el">Deslocamento</span><span class="es">Eu mesmo levo/busco</span>
+          </label>
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl">Mensagem para o dono (opcional)</label>
+        <textarea class="fta" id="mp-msg" placeholder="Ex: Posso na terça ao meio-dia!"></textarea>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-prop')">Cancelar</button>
+      <button class="btn btn-success" onclick="confirmarInteresse()">✓ Confirmar interesse</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ACEITAR / VER INTERESSADOS -->
+<div class="mwrap" id="modal-interesse" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title">Interessados</span>
+      <button class="mclose" onclick="fm('modal-interesse')">✕</button>
+    </div>
+    <div class="mbody" id="mi-body"></div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-interesse')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONVERSA (interessado com dono) -->
+<div class="mwrap" id="modal-conversa" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title" id="mc-titulo">Conversa</span>
+      <button class="mclose" onclick="fm('modal-conversa')">✕</button>
+    </div>
+    <div class="mbody">
+      <div id="mc-preview" style="margin-bottom:12px"></div>
+      <div class="msg-thread" id="mc-thread" style="max-height:200px;overflow-y:auto;margin-bottom:12px;padding:12px;background:var(--s2);border-radius:var(--rsm)"></div>
+      <div class="com-input-row" style="display:flex;gap:8px">
+        <input class="fi" id="mc-input" type="text" placeholder="Enviar mensagem..." style="flex:1" onkeydown="if(event.key==='Enter')enviarMensagemComoInteressado()">
+        <button class="btn btn-primary btn-sm" onclick="enviarMensagemComoInteressado()">Enviar</button>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-conversa')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CADASTRAR / EDITAR LANCHE -->
+<div class="mwrap" id="modal-lanche" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mhead">
+      <span class="mhead-title" id="ml-titulo">Novo lanche</span>
+      <button class="mclose" onclick="fm('modal-lanche')">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="fg">
+        <label class="fl">Foto do lanche</label>
+        <label class="foto-upload" id="foto-upload-label" onclick="document.getElementById('foto-input').click()">
+          <input type="file" id="foto-input" accept="image/*" onchange="onFotoChange(event)">
+          <span id="foto-placeholder">
+            <span style="display:block;font-size:1.8rem;margin-bottom:6px">📸</span>
+            <span style="display:block;font-size:.82rem;color:var(--ink-mid)">Clique para adicionar foto</span>
+          </span>
+          <img
+            id="foto-preview-img"
+            class="foto-preview"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
+            alt=""
+            style="display:none">
+        </label>
+        <div style="margin-top:8px;">
+          <label class="fl" style="margin-bottom:5px">Ou cole uma URL de imagem</label>
+          <input class="fi" id="foto-url" type="url" placeholder="https://..." oninput="onFotoUrl(this.value)">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl" for="ml-nome">Nome do lanche</label>
+        <input class="fi" id="ml-nome" type="text" placeholder="Ex: Burrito de Carne">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl" for="ml-desc">Descrição / ingredientes</label>
+        <textarea class="fta" id="ml-desc" placeholder="Ex: Burrito recheado com carne temperada, arroz, feijão, queijo e molho especial"></textarea>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-ghost" onclick="fm('modal-lanche')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarLanche()">Salvar lanche</button>
+    </div>
+  </div>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
+
