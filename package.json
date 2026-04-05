@@ -4,7 +4,9 @@
   "description": "TrocaLanches - front-end SPA e backend simples em Node/Express",
   "main": "backend/server.js",
   "scripts": {
+    "start": "node backend/server.js",
     "start:backend": "node backend/server.js",
+   
     "test": "cross-env NODE_ENV=test node --test tests/api.test.js",
     "test:api": "cross-env NODE_ENV=test node --test tests/api.test.js",
     "test:e2e": "npx playwright test"
