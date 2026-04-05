@@ -8,15 +8,17 @@ const request = require('supertest');
 
 process.env.NODE_ENV = 'test';
 const app = require('../backend/server');
-const resetState = app.resetState;
+
+/** Com Supabase os dados persistem; esta função reserva o gancho para futuros resets. */
+function resetState() {}
 
 describe('TrocaLanches API', () => {
-  before(() => resetState());
-  after(() => resetState());
+  // Nota: Com Supabase, não há estado em memória para resetar
+  // Os dados persistem entre testes (é esperado com BD real)
 
   describe('1. Health / Raiz', () => {
-    it('GET / retorna status ok', async () => {
-      const res = await request(app).get('/');
+    it('GET /health retorna status ok', async () => {
+      const res = await request(app).get('/health');
       assert.strictEqual(res.status, 200);
       assert.strictEqual(res.body.status, 'ok');
       assert.ok(res.body.message?.includes('TrocaLanches'));
@@ -28,10 +30,11 @@ describe('TrocaLanches API', () => {
       const res = await request(app)
         .post('/auth/login')
         .send({ nome: 'João Silva', local: 'Hamburgueria' });
-      assert.strictEqual(res.status, 200);
+      assert.ok([200, 201].includes(res.status));
       assert.ok(res.body.id);
       assert.strictEqual(res.body.nome, 'João Silva');
       assert.strictEqual(res.body.local, 'Hamburgueria');
+      assert.ok(res.body.token, 'login deve retornar JWT');
     });
 
     it('POST /auth/login rejeita sem nome', async () => {
@@ -52,8 +55,28 @@ describe('TrocaLanches API', () => {
     it('POST /auth/login reutiliza usuário existente (mesmo nome+local)', async () => {
       await request(app).post('/auth/login').send({ nome: 'Ana Costa', local: 'Padaria' });
       const res = await request(app).post('/auth/login').send({ nome: 'Ana Costa', local: 'Padaria' });
-      assert.strictEqual(res.status, 200);
+      assert.ok([200, 201].includes(res.status));
       assert.ok(res.body.id);
+    });
+
+    it('GET /lanches com Bearer inválido retorna 401', async () => {
+      const res = await request(app)
+        .get('/lanches')
+        .set('Authorization', 'Bearer token-invalido');
+      assert.strictEqual(res.status, 401);
+    });
+
+    it('GET /lanches com Bearer válido após login funciona', async () => {
+      const login = await request(app)
+        .post('/auth/login')
+        .send({ nome: 'JWT Tester', local: 'Café' });
+      const token = login.body.token;
+      assert.ok(token);
+      const res = await request(app)
+        .get('/lanches')
+        .set('Authorization', `Bearer ${token}`);
+      assert.strictEqual(res.status, 200);
+      assert.ok(Array.isArray(res.body));
     });
   });
 
@@ -105,7 +128,7 @@ describe('TrocaLanches API', () => {
       assert.strictEqual(res.status, 200);
       assert.ok(Array.isArray(res.body));
       assert.ok(res.body.length >= 1);
-      assert.ok(res.body.every(l => l.donoId === userA.id));
+      assert.ok(res.body.every(l => (l.dono_id || l.donoId) === userA.id));
     });
 
     it('PUT /lanches atualiza lanche (apenas dono)', async () => {
@@ -126,7 +149,7 @@ describe('TrocaLanches API', () => {
         .put(`/lanches/${id}`)
         .set('x-user-id', userB.id)
         .send({ nome: 'Tentativa Hack', desc: '', foto: null });
-      assert.strictEqual(res.status, 404);
+      assert.strictEqual(res.status, 403);
     });
 
     it('DELETE /lanches rejeita se não for dono (segurança)', async () => {
@@ -135,7 +158,7 @@ describe('TrocaLanches API', () => {
       const res = await request(app)
         .delete(`/lanches/${id}`)
         .set('x-user-id', userB.id);
-      assert.strictEqual(res.status, 404);
+      assert.strictEqual(res.status, 403);
     });
   });
 
@@ -185,7 +208,7 @@ describe('TrocaLanches API', () => {
         .set('x-user-id', userInteressado.id)
         .send({ entrega: '🚶 Deslocamento' });
       assert.strictEqual(res.status, 400);
-      assert.ok(res.body.error?.includes('Já existe'));
+      assert.ok(/já tem interesse|já existe/i.test(res.body.error || ''));
     });
 
     it('POST /propostas/:id/aceitar cria troca no feed', async () => {
@@ -253,7 +276,11 @@ describe('TrocaLanches API', () => {
         .set('x-user-id', userA.id)
         .send({ texto: 'Foi ótima a troca!' });
       assert.strictEqual(res.status, 201);
-      assert.ok(res.body.comentarios?.some(c => c.texto === 'Foi ótima a troca!' && c.autor === 'Alice'));
+      assert.ok(
+        res.body.comentarios?.some(
+          (c) => c.texto === 'Foi ótima a troca!' && (c.autor === 'Alice' || c.usuarioId === userA.id)
+        )
+      );
     });
 
     it('Não-participante NÃO pode comentar (segurança)', async () => {

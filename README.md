@@ -1,88 +1,122 @@
 # TrocaLanches
 
-Aplicação **100% front-end** (arquivo `.html` único) para **troca de lanches** entre pessoas. Não há servidor: os dados ficam salvos no navegador via **localStorage**.
+Aplicação web para troca de lanches entre pessoas, composta por um frontend SPA (Single Page Application) e um backend REST API em Node.js/Express.
 
-## Como executar
+## Visão Geral
 
-- **Opção simples**: abra o arquivo `trocalanches (1).html` no navegador (duplo clique).
-- **Opção recomendada (dev)**: use um servidor local (ex.: extensão “Live Server” no VS Code/Cursor) para evitar limitações de alguns navegadores ao carregar recursos locais.
+O TrocaLanches permite que usuários cadastrem lanches para troca, demonstrem interesse em propostas de outros usuários, e interajam em um feed de trocas concluídas. O sistema foca em usabilidade, segurança e eficiência, atendendo à demanda por plataformas de compartilhamento comunitário de alimentos.
 
-## Funcionalidades
+### Funcionalidades Principais
 
-- **Perfil**
-  - Salvar **nome** e **local de trabalho**.
-  - Cadastrar **lanches** (nome, descrição e **foto** por upload ou URL).
-  - Editar/remover lanches cadastrados.
+- **Perfil de Usuário**: Cadastro de nome e local de trabalho.
+- **Gerenciamento de Lanches**: CRUD de lanches com foto (upload ou URL).
+- **Propostas de Troca**: Lista pública de propostas abertas.
+- **Interesse e Negociação**: Demonstração de interesse com opções de entrega e mensagens.
+- **Feed de Trocas**: Visualização de trocas concluídas com reações e comentários (apenas participantes).
+- **Notificações**: Badge para novidades em trocas participadas.
 
-- **Propostas**
-  - Lista de **propostas abertas** (inclui dados demo no primeiro uso).
-  - Quem vê uma proposta pode **demonstrar interesse** e escolher **forma de entrega**:
-    - 🛵 Motoboy
-    - 🚶 Deslocamento
-  - Dono da proposta pode **ver interessados**, **aceitar troca** ou **recusar**.
+## Arquitetura
 
-- **Feed**
-  - Trocas aceitas vão para o feed como “trocas concluídas”.
-  - Qualquer pessoa pode **reagir** (após configurar o perfil).
-  - **Comentários**: apenas participantes da troca podem comentar.
-  - Badge no menu do Feed com “novidades” para participantes (quando há comentários de outras pessoas em trocas das quais você participou).
+### Componentes
 
-## Persistência de dados (importante)
+- **Frontend**: SPA em JavaScript vanilla, HTML5 e CSS3. Responsivo, acessível.
+- **Backend**: API REST em Node.js/Express, estado atualmente em memória (para desenvolvimento).
+- **Persistência**: LocalStorage no frontend; arrays em memória no backend (piloto).
+- **Testes**: API unitários/integração com Node.js built-in; E2E com Playwright.
 
-- Tudo é salvo no **localStorage** do navegador, na chave **`tl4`**.
-- Para “zerar” a aplicação:
-  - Abra o DevTools do navegador → Application/Storage → Local Storage → remova a chave `tl4`
-  - ou limpe os dados do site.
+### Fluxo de Dados
 
-## Estrutura do projeto
+1. Usuário configura perfil → Salvo localmente e sincronizado com backend.
+2. Cadastro de lanche → Cria proposta aberta automaticamente.
+3. Interesse em proposta → Registra com opções de entrega.
+4. Aceitação → Move para feed como troca concluída.
+5. Interações no feed → Reações públicas, comentários privados para participantes.
 
-Este projeto está atualmente em **um único arquivo**:
+### Princípios de Engenharia de Software Aplicados
 
-- `trocalanches (1).html`: HTML + CSS + JavaScript (UI, estado, renderização e persistência).
+- **Estrutura**: Separação clara entre frontend (UI) e backend (lógica/API).
+- **Organização**: Código modular, funções reutilizáveis.
+- **Design**: Padrão RESTful para APIs, estado gerenciado centralmente.
+- **Testagem**: Cobertura completa de cenários críticos (25 API + 7 E2E).
+- **Documentação**: Guias de uso, testes e arquitetura.
+- **Qualidade**: Validação de entrada, isolamento de dados por usuário.
+- **Eficiência**: Carregamento assíncrono, minimização de requests.
+- **Segurança**: Autenticação obrigatória para ações, isolamento de dados.
+- **Confiabilidade**: Tratamento de erros, testes automatizados.
+- **Manutenibilidade**: Código comentado, estrutura simples.
 
-Documentos:
+## Instalação e Execução
 
-- `docs/USO.md`: guia rápido de uso e fluxos.
+### Pré-requisitos
+
+- Node.js 18+
+- Navegador moderno (Chrome recomendado para desenvolvimento)
+
+### Passos
+
+1. Clone o repositório:
+   ```bash
+   git clone <url-do-repo>
+   cd troca-lanches
+   ```
+
+2. Instale dependências:
+   ```bash
+   npm install
+   ```
+
+3. Para desenvolvimento (backend + frontend):
+   ```bash
+   npm run start:backend  # Inicia backend em http://localhost:3000
+   # Abra index.html no navegador ou use extensão Live Server
+   ```
+
+4. Para testes:
+   ```bash
+   npm run test:api       # Testes de API (~3s)
+   npm run test:e2e       # Testes E2E (~40s, requer backend rodando)
+   ```
 
 ## Testes
 
-O projeto possui testes que garantem **usabilidade**, **segurança** e que o app **entrega o que promete**:
+### Estratégia
 
-### Testes de API (25 cenários)
+- **API**: Validação de endpoints, segurança, fluxos completos.
+- **E2E**: Simulação de usuário real no navegador.
+- Cobertura: 100% dos cenários críticos.
 
-- Health, autenticação, validações
-- CRUD de lanches com verificação de dono (segurança)
-- Fluxo completo: proposta → interesse → aceitar → feed
-- Reações e comentários (apenas participantes comentam)
-- Validação de entrada
+### Resultados Recentes
 
-```bash
-npm test
-# ou
-npm run test:api
-```
+- API: 25/25 testes passando.
+- E2E: 7/7 testes passando.
 
-### Testes E2E (7 fluxos de usuário)
+## Limitações e Melhorias Futuras
 
-- Configurar perfil
-- Cadastrar lanche
-- Ver propostas e feed
-- Navegação entre abas
-- Modal lanche (cancelar)
+### Atual
 
-```bash
-npm run test:e2e
-```
+- Persistência em memória: Dados perdidos ao reiniciar.
+- Autenticação simples: Sem JWT ou sessões reais.
+- Escalabilidade: Não suporta múltiplos usuários simultâneos.
 
-> **Nota**: Os testes E2E iniciam o backend automaticamente e usam Chromium. Instale os browsers com `npx playwright install` na primeira vez.
+### Sugestões de Melhoria
 
-## Publicação (sem backend)
+- **Banco de Dados**: Migrar para PostgreSQL ou MongoDB.
+- **Autenticação**: Implementar JWT, OAuth.
+- **Segurança**: Rate limiting, sanitização de entrada, HTTPS.
+- **Performance**: Cache, otimização de imagens.
+- **Monitoramento**: Logs, métricas com ferramentas como Winston e PM2.
+- **Deploy**: Containerização com Docker, CI/CD com GitHub Actions.
+- **Frontend**: Migrar para React/Vue para melhor manutenção.
+- **Testes**: Adicionar testes de carga, acessibilidade.
 
-Como é estático, dá para publicar em:
+## Contribuição
 
-- GitHub Pages
-- Netlify
-- Vercel
+1. Fork o projeto.
+2. Crie uma branch para sua feature.
+3. Adicione testes para novas funcionalidades.
+4. Submeta PR com descrição detalhada.
 
-Basta hospedar o arquivo `.html` (e quaisquer assets adicionais, se forem criados no futuro).
+## Licença
+
+MIT
 

@@ -1,0 +1,24 @@
+module.exports = function authRouter({ usuarios, gerarId, authMiddleware }) {
+  const router = require('express').Router();
+
+  router.post('/auth/login', (req, res) => {
+    const { nome, local } = req.body || {};
+    if (!nome || !local) {
+      return res.status(400).json({ error: 'nome e local são obrigatórios' });
+    }
+    let user = usuarios.find(u => u.nome === nome && u.local === local);
+    if (!user) {
+      user = { id: gerarId(), nome, local };
+      usuarios.push(user);
+    } else {
+      user.local = local;
+    }
+    res.json(user);
+  });
+
+  router.get('/me', authMiddleware, (req, res) => {
+    res.json(req.user);
+  });
+
+  return router;
+};

@@ -1,80 +1,119 @@
-# Guia de uso — TrocaLanches
+# Guia de Uso Completo — TrocaLanches
 
-## 1) Primeiro acesso (dados demo)
+## Introdução
 
-Ao abrir a aplicação pela primeira vez, ela carrega **propostas** e **feed** de exemplo para demonstração. Depois disso, tudo passa a ser salvo no seu navegador.
+O TrocaLanches é uma plataforma web para troca de lanches entre pessoas. Este guia cobre desde o primeiro acesso até funcionalidades avançadas.
 
-## 2) Configurar perfil
+## Primeiro Acesso
 
-1. Abra a aba **Perfil**.
-2. Preencha **Seu nome**.
-3. Selecione **Onde você trabalha**.
-4. Clique em **Salvar perfil**.
+1. Abra `index.html` em um navegador moderno.
+2. Na primeira vez, o app carrega dados de demonstração.
+3. Configure seu perfil para começar a usar.
 
-Sem perfil salvo, você não consegue demonstrar interesse, reagir ou comentar.
+## Configuração de Perfil
 
-## 3) Cadastrar um lanche (para aparecer em Propostas)
-
-1. Na aba **Perfil**, clique em **Adicionar lanche**.
+1. Clique na aba **Perfil**.
 2. Preencha:
-   - **Foto do lanche** (upload) *ou* **URL de imagem**
-   - **Nome do lanche**
-   - **Descrição / ingredientes**
-3. Clique em **Salvar lanche**.
+   - **Nome**: Seu nome completo.
+   - **Local**: Onde você trabalha (ex: Hamburgueria, Pizzaria).
+3. Clique **Salvar perfil**.
+4. O header será atualizado com seu nome.
 
-Após salvar, o sistema sincroniza automaticamente e cria/atualiza uma **proposta aberta** para o seu lanche.
+**Nota**: Sem perfil, você não pode demonstrar interesse ou interagir no feed.
 
-## 4) Demonstrar interesse em uma proposta
+## Gerenciamento de Lanches
 
-1. Vá para **Propostas**.
-2. Em uma proposta de outra pessoa, clique em **✓ Tenho interesse**.
-3. Escolha a forma de entrega:
-   - **🛵 Motoboy**
-   - **🚶 Deslocamento**
-4. (Opcional) escreva uma mensagem para o dono do lanche.
-5. Clique em **✓ Confirmar interesse**.
+### Cadastrar Lanche
 
-Depois disso, a proposta fica marcada como “Você demonstrou interesse”.
+1. Na aba **Perfil**, clique **Adicionar lanche**.
+2. Preencha:
+   - **Foto**: Upload de arquivo ou URL.
+   - **Nome**: Nome do lanche (obrigatório).
+   - **Descrição**: Ingredientes ou detalhes.
+3. Clique **Salvar lanche**.
+4. O lanche aparece na lista e uma proposta é criada automaticamente.
 
-## 5) Responder interessados (dono da proposta)
+### Editar/Remover Lanche
 
-Se a proposta é sua e houver interessados:
+- Clique no lanche na lista.
+- Edite campos e salve, ou clique **Remover**.
 
-1. Em **Propostas**, clique em **“N interesse(s) — responder”**.
-2. Para cada interessado, escolha:
-   - **✓ Aceitar troca** (a troca vai para o **Feed**)
-   - **Recusar** (remove o interessado da lista)
+**Segurança**: Apenas o dono pode editar/remover.
 
-Ao aceitar, a proposta é removida de “Propostas” e aparece no **Feed** como troca concluída.
+## Propostas de Troca
 
-## 6) Interagir no Feed (reações e comentários)
+### Visualizar Propostas
 
-- **Reações**: exigem perfil configurado.
+1. Clique na aba **Propostas**.
+2. Veja lista de propostas abertas de outros usuários.
+
+### Demonstrar Interesse
+
+1. Em uma proposta, clique **✓ Tenho interesse**.
+2. Escolha forma de entrega:
+   - 🛵 Motoboy
+   - 🚶 Deslocamento
+3. (Opcional) Adicione mensagem.
+4. Clique **✓ Confirmar interesse**.
+
+### Responder Interessados (Dono)
+
+1. Se sua proposta tem interessados, clique **“N interesse(s) — responder”**.
+2. Para cada um:
+   - **✓ Aceitar troca**: Move para Feed.
+   - **Recusar**: Remove da lista.
+
+## Feed de Trocas
+
+### Visualizar Trocas
+
+1. Clique na aba **Feed**.
+2. Veja trocas concluídas.
+
+### Interagir
+
+- **Reações**: Clique em emojis (😍, 👏, 🔥, 😋) — requer perfil.
 - **Comentários**:
-  - Apenas quem participou da troca pode comentar.
-  - Você pode enviar pelo botão **Enviar** ou pressionando **Enter** no campo.
+  - Apenas participantes podem comentar.
+  - Digite e pressione Enter ou clique **Enviar**.
 
-## 7) “Novidades” no Feed (badge)
+### Notificações
 
-O badge no menu do **Feed** aparece quando:
+- Badge no menu **Feed** indica novidades (comentários de outros em suas trocas).
 
-- você participou da troca (seu nome está em um dos lados), e
-- existe comentário de outra pessoa nessa troca.
-
-## 8) Limpar dados (reset)
-
-A aplicação salva dados no **localStorage** do navegador na chave **`tl4`**.
+## Limpeza de Dados
 
 Para resetar:
 
-1. Abra o DevTools do navegador (F12).
-2. Vá em Application/Storage → Local Storage.
-3. Remova a chave `tl4` (ou limpe os dados do site).
-4. Recarregue a página.
+1. Abra DevTools (F12).
+2. Application → Local Storage → Remova chave `tl4`.
+3. Recarregue a página.
 
-## Limitações atuais (por design)
+## Solução de Problemas
 
-- Não há autenticação, multiusuário real ou sincronização entre dispositivos.
-- Os dados são **locais por navegador**.
-- Upload de foto vira **data URL** e pode aumentar bastante o tamanho do localStorage.
+### Erro de Conexão
+- Certifique-se de que o backend está rodando (`npm run start:backend`).
+- Verifique console do navegador para erros.
+
+### Dados Não Salvam
+- Verifique se há espaço em localStorage.
+- Limpe dados do site.
+
+### Testes Não Passam
+- Execute `npm install` para atualizar dependências.
+- Para E2E, instale browsers: `npx playwright install`.
+
+## Funcionalidades Avançadas
+
+- **Mensagens em Interesse**: Adicione notas ao demonstrar interesse.
+- **Fotos Grandes**: Limite de 50MB por imagem.
+- **Navegação**: Use abas para alternar telas.
+
+## Limitações
+
+- Dados locais: Não sincroniza entre dispositivos.
+- Sem autenticação real: Baseado em header simples.
+- Estado volátil: Dados perdidos ao reiniciar servidor.
+
+Para produção, considere melhorias em persistência e segurança.
 

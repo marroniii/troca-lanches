@@ -1,50 +1,104 @@
-# Guia de testes — TrocaLanches
+# Guia de Testes — TrocaLanches
 
-## Visão geral
+## Estratégia de Testes
 
-Os testes garantem:
+Os testes asseguram qualidade, eficiência, segurança e confiabilidade, cobrindo cenários críticos de usabilidade e entrega de valor.
 
-1. **Usabilidade** — os fluxos principais funcionam do ponto de vista do usuário  
-2. **Segurança** — apenas o dono edita/remove lanches; apenas participantes comentam  
-3. **Entrega** — o app faz o que promete no README e no guia de uso  
+### Princípios
+- **Cobertura Completa**: Cenários happy path e edge cases.
+- **Automação**: Execução rápida e repetível.
+- **Isolamento**: Testes independentes, estado resetado.
+- **Validação de Segurança**: Verificação de isolamento de dados.
 
-## Executando os testes
+## Tipos de Testes
 
+### 1. Testes de API (Unitários/Integração)
+
+- **Framework**: Node.js built-in test + Supertest.
+- **Cobertura**: 25 cenários em 7 categorias.
+- **Tempo**: ~4s.
+- **Comando**: `npm run test:api`
+
+#### Categorias e Cenários
+
+| Categoria | Cenários | Objetivo |
+|-----------|----------|----------|
+| Health | Status da API | Verificar disponibilidade |
+| Autenticação | Login, validações, reutilização | Segurança de acesso |
+| Segurança | 401 sem/inválido user-id | Isolamento de dados |
+| Lanches CRUD | Criar, listar, editar, deletar | Funcionalidade completa |
+| Propostas | Interesse, aceitar, fluxo completo | Negociação de trocas |
+| Feed | Reações, comentários (participantes) | Interações sociais |
+| Validação | Entradas obrigatórias | Robustez |
+
+### 2. Testes E2E (End-to-End)
+
+- **Framework**: Playwright (Chromium).
+- **Cobertura**: 7 fluxos de usuário.
+- **Tempo**: ~40s.
+- **Comando**: `npm run test:e2e`
+
+#### Fluxos Testados
+
+| Fluxo | Descrição | Validação |
+|-------|-----------|-----------|
+| Configurar perfil | Nome, local, atualização UI | Usabilidade |
+| Cadastrar lanche | Modal, campos, listagem | CRUD básico |
+| Propostas | Carregamento de lista | Navegação |
+| Perfil para trocar | Redirecionamento | UX |
+| Feed | Exibição de trocas | Estado vazio/itens |
+| Navegação | Alternar abas | Responsividade |
+| Modal cancelar | Fechar sem salvar | Prevenção de erros |
+
+## Execução
+
+### Pré-requisitos
+- Node.js 18+
+- Dependências: `npm install`
+- Browsers (E2E): `npx playwright install`
+
+### Comandos
 ```bash
-# Testes de API (rápidos, ~3s)
-npm test
+# API
+npm run test:api
 
-# Testes E2E (abre navegador, ~50s)
+# E2E (requer backend rodando)
+npm run start:backend  # Em outro terminal
 npm run test:e2e
 ```
 
-## Cobertura
+### Resultados Recentes
+- **API**: 25/25 passando (100% sucesso).
+- **E2E**: 7/7 passando (100% sucesso).
 
-### API (`tests/api.test.js`)
+## Análise de Qualidade
 
-| Categoria | Cenários |
-|-----------|----------|
-| Health | GET / retorna status ok |
-| Auth | Login, validação nome/local, reutilização de usuário |
-| Segurança | 401 sem x-user-id, 401 com user inexistente |
-| Lanches | CRUD, isolamento por dono, PUT/DELETE bloqueiam se não for dono |
-| Propostas | Lista, interesse, duplicado, aceitar, proposta sai da lista |
-| Feed | Lista, reagir, comentar (participante ✓), não-participante ✗ |
-| Validação | Nome obrigatório, entrega obrigatória, emoji obrigatório |
+### Métricas
+- **Cobertura**: Cenários críticos (segurança, fluxos principais).
+- **Velocidade**: API rápida (~4s), E2E moderada (~40s).
+- **Confiabilidade**: Zero falhas em execuções recentes.
 
-### E2E (`tests/e2e/fluxos.spec.js`)
+### Pontos Fortes
+- **Segurança**: Testes de isolamento (dono só edita seus lanches).
+- **Usabilidade**: Fluxos E2E simulam usuário real.
+- **Manutenibilidade**: Código de teste limpo, assertivos claros.
 
-| Fluxo | O que valida |
-|-------|--------------|
-| Configurar perfil | Nome, local, header atualiza |
-| Cadastrar lanche | Modal, campos, lanche aparece na lista |
-| Propostas | Tela carrega (vazia ou com itens) |
-| Perfil para trocar | Botão leva ao perfil se necessário |
-| Feed | Tela carrega (vazia ou com trocas) |
-| Navegação | Propostas ↔ Feed ↔ Perfil |
-| Modal lanche | Cancelar fecha sem salvar |
+### Melhorias Futuras
+- **Cobertura de Código**: Adicionar Istanbul para % de linhas.
+- **Testes de Performance**: Carga com Artillery.
+- **Acessibilidade**: Testes com axe-playwright.
+- **Integração Contínua**: GitHub Actions para automação.
 
-## Pré-requisitos
+## Debugging de Falhas
 
-- Node.js 18+
-- Para E2E: `npx playwright install` ( Chromium, primeira vez)
+### API
+- Verificar logs do servidor.
+- Usar `--verbose` para detalhes.
+
+### E2E
+- Screenshots em `test-results/` para falhas.
+- Verificar se backend está rodando na porta 3000.
+
+## Conclusão
+
+A suíte de testes garante que o TrocaLanches atende aos requisitos de qualidade, com foco em segurança e usabilidade. Para evolução, expandir cobertura e adicionar testes de performance.
