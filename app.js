@@ -12,7 +12,21 @@ let fotoB64 = null;
 let fotoLoadPromise = null;
 
 let D = { perfil:null, lanches:[], propostas:[], feed:[] };
+function irPara(secao) {
+  // Esconde todas as screens
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  
+  // Remove active de todos os botões do nav
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
 
+  // Mostra a screen escolhida
+  const screen = document.getElementById('screen-' + secao);
+  if (screen) screen.classList.add('active');
+
+  // Marca o botão ativo
+  const tab = document.getElementById('tab-' + secao);
+  if (tab) tab.classList.add('active');
+}
 /* ── PERSIST / API ── */
 function saveLocalUser(user){
   if(user){
