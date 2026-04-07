@@ -42,46 +42,6 @@ function loadLocalUser(){
   try { return JSON.parse(s); } catch { return null; }
 }
 
-async function apiFetch(path, options = {}) {
-  const user = D.perfil || loadLocalUser();
-  const headers = { 
-    'Content-Type': 'application/json',
-    'apikey': SUPABASE_KEY,        
-    ...(options.headers || {}) 
-  };
-  // ✅ FIX 3: Envia JWT quando disponível, x-user-id como fallback
-  async function apiFetch(path, options = {}) {
-  const user = D.perfil || loadLocalUser();
-  const headers = { 
-    'Content-Type': 'application/json',
-    'apikey': SUPABASE_KEY,        // ← ADICIONA ISSO
-    ...(options.headers || {}) 
-  };
-
-  let res;
-  try {
-    res = await fetch(API_BASE + path, { ...options, headers });
-  } catch (e) {
-    const err = new Error('Não foi possível conectar ao backend. Execute: npm run start:backend');
-    err.original = e;
-    err.status = 0;
-    throw err;
-  }
-  if(!res.ok){
-    const text = await res.text();
-    let msg = text;
-    try {
-      const j = JSON.parse(text);
-      if (j.error) msg = j.error;
-    } catch (_) {}
-    const err = new Error(msg || ('Erro HTTP ' + res.status));
-    err.status = res.status;
-    throw err;
-  }
-  const ct = res.headers.get('content-type') || '';
-  return ct.includes('application/json') ? res.json() : res.text();
-}
-
 // ✅ FIX 4: Renovação automática do token ao iniciar
 async function loadFromApi(){
   const user = loadLocalUser();
@@ -196,16 +156,7 @@ async function salvarPerfil(){
   if(!nome){ alert('Preencha seu nome'); return; }
   try{
     const user = await apiFetch('/auth/login',{
-      method:'POST',
-      body:JSON.stringify({ nome, local })
-    });
-    D.perfil = user;
-    saveLocalUser(user);
-    atualizarHeader(); renderPerfil(); renderPropostas(); renderFeed(); atualizarBadgeFeed();
-    alert('Perfil salvo!');
-  }catch(e){
-    console.error(e);
-    alert('Erro ao salvar perfil na API');
+     
   }
 }
 
