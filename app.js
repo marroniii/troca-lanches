@@ -141,9 +141,9 @@ function atualizarBadgeFeed(){
   // ✅ FIX 6: Comparação por ID, não por nome
   const euId = D.perfil?.id;
   if(!euId){ document.getElementById('bdot-feed').style.display='none'; return; }
-  const n = D.feed.filter(f=>
+  const n = (D.feed || []).filter(f=>
     (f.aId===euId || f.bId===euId) &&
-    f.comentarios.some(c => c.autorId !== euId)
+    (f.comentarios || []).some(c => c.usuarioId !== euId)
   ).length;
   const b = document.getElementById('bdot-feed');
   b.style.display = n>0?'inline-flex':'none'; b.textContent=n;
@@ -328,7 +328,7 @@ function getBuscaPropostas(){
 }
 
 function propostasFiltradas(){
-  const lista = D.propostas.filter(p=>p.status==='aberta');
+  const lista = (D.propostas || []).filter(p=>p.status==='aberta');
   const q = getBuscaPropostas();
   if(!q) return lista;
   return lista.filter(p=>{
@@ -347,7 +347,7 @@ function filtrarPropostas(){
 function renderPropostas(){
   const el = document.getElementById('lista-propostas');
   const lista = propostasFiltradas();
-  const total = D.propostas.filter(p=>p.status==='aberta').length;
+  const total = (D.propostas || []).filter(p=>p.status==='aberta').length;
   if(!total){
     el.innerHTML='<div class="empty"><div class="ei">🍽️</div><div class="et">Nenhuma proposta aberta</div><div class="es">Cadastre um lanche no seu perfil para aparecer aqui</div></div>';
     return;
@@ -365,8 +365,8 @@ function safeId(id){ return String(id).replace(/[^a-zA-Z0-9_-]/g,'_'); }
 function cardProposta(p){
   const eu = D.perfil?.nome;
   const ehMinha = p.autorNome===eu;
-  const jaTenhoInteresse = p.interessados.some(i=>i.nome===eu);
-  const ni = p.interessados.length;
+  const jaTenhoInteresse = (p.interessados || []).some(i=>i.nome===eu);
+  const ni = (p.interessados || []).length;
 
   let acoes = '';
   if(!eu){
@@ -454,11 +454,11 @@ async function confirmarInteresse(){
 
 /* ── VER INTERESSADOS (dono do lanche) ── */
 function verInteressados(id){
-  const p = D.propostas.find(x=>x.id===id);
+  const p = (D.propostas || []).find(x=>x.id===id);
   if(!p) return;
   propSel = id;
   const msgs = (i) => (i.mensagens || (i.mensagem ? [{ autor: i.nome, texto: i.mensagem, data: '' }] : []));
-  document.getElementById('mi-body').innerHTML = p.interessados.map(i=>{
+  document.getElementById('mi-body').innerHTML = (p.interessados || []).map(i=>{
     const thread = msgs(i);
     return `
     <div class="interessado-card" style="border:1px solid var(--s3);border-radius:var(--rsm);padding:14px;margin-bottom:12px">
@@ -590,11 +590,11 @@ async function aceitarTroca(propId, interessadoUsuarioId){
 /* ── FEED ── */
 function renderFeed(){
   const el = document.getElementById('lista-feed');
-  if(!D.feed.length){
+  if(!(D.feed || []).length){
     el.innerHTML='<div class="empty"><div class="ei">💬</div><div class="et">Nenhuma troca concluída ainda</div><div class="es">As trocas confirmadas aparecem aqui</div></div>';
     return;
   }
-  el.innerHTML = D.feed.map(f=>cardFeed(f)).join('');
+  el.innerHTML = (D.feed || []).map(f=>cardFeed(f)).join('');
 }
 
 function cardFeed(f){
@@ -608,19 +608,24 @@ function cardFeed(f){
     </button>`;
   }).join('');
 
-  const coms = f.comentarios.map(c=>`
+  const coms = (f.comentarios || []).map(c=>{
+    const dataFmt = c.data && typeof c.data === 'string' && c.data.includes('T') 
+      ? new Date(c.data).toLocaleDateString('pt-BR')
+      : c.data || '';
+    return `
     <div class="comentario-item">
-      <div class="com-avatar">${c.autor.charAt(0).toUpperCase()}</div>
+      <div class="com-avatar">${c.autor?.charAt(0).toUpperCase() || '?'}</div>
       <div class="com-bubble">
-        <div class="com-autor">${c.autor}</div>
-        <div class="com-texto">${c.texto}</div>
-        <div class="com-data">${c.data}</div>
+        <div class="com-autor">${c.autor || 'Usuário'}</div>
+        <div class="com-texto">${c.texto || ''}</div>
+        <div class="com-data">${dataFmt}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   const comInput = participa
     ? `<div class="com-input-row">
-        <input class="fi" id="ci-${String(f.id).replace(/["'<>]/g,'')}" type="text" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter')comentar('${escId(f.id)}')">
+        <input class="fi" id="ci-${escId(f.id)}" type="text" placeholder="Escreva um comentário..." onkeydown="if(event.key==='Enter')comentar('${escId(f.id)}')">
         <button class="btn btn-primary btn-sm" onclick="comentar('${escId(f.id)}')">Enviar</button>
        </div>`
     : `<div class="com-locked">Só os participantes da troca podem comentar</div>`;
@@ -664,7 +669,8 @@ async function reagir(feedId, emoji){
 
 async function comentar(feedId){
   if(!D.perfil) return;
-  const inp = document.getElementById('ci-'+feedId);
+  const inp = document.getElementById('ci-'+escId(feedId));
+  if(!inp) { console.warn('Input não encontrado para:', feedId); return; }
   const txt = inp.value.trim();
   if(!txt) return;
   try{
