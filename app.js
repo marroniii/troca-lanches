@@ -1,7 +1,8 @@
 // ✅ FIX 1: API_BASE dinâmico — funciona em localhost e produção
 const API_BASE = window.location.hostname === 'localhost'
   ? 'http://localhost:3000'
-  : '';
+  : 'https://dergtdpqjczigbvvsbzu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_DBhJfJFhdMw9eTT3KUdQeA_GQgRrSaT';
 
 // ✅ FIX 2: Variáveis globais declaradas corretamente
 let lancheEditId = null;
@@ -29,14 +30,19 @@ function loadLocalUser(){
 
 async function apiFetch(path, options = {}) {
   const user = D.perfil || loadLocalUser();
-  const headers = { 'Content-Type':'application/json', ...(options.headers||{}) };
-
+  const headers = { 
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_KEY,        
+    ...(options.headers || {}) 
+  };
   // ✅ FIX 3: Envia JWT quando disponível, x-user-id como fallback
-  if(user?.token){
-    headers['Authorization'] = `Bearer ${user.token}`;
-  } else if(user?.id){
-    headers['x-user-id'] = user.id;
-  }
+  async function apiFetch(path, options = {}) {
+  const user = D.perfil || loadLocalUser();
+  const headers = { 
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_KEY,        // ← ADICIONA ISSO
+    ...(options.headers || {}) 
+  };
 
   let res;
   try {
